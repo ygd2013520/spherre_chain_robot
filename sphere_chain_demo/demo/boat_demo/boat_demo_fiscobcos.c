@@ -29,6 +29,7 @@ SOFTWARE.
 #include "boat_demo_fiscobcos.h"
 #include <pthread.h>
 #include <applibs/wificonfig.h>
+#include <applibs/log.h>
 
 static uint8_t mSsid[WIFICONFIG_SSID_MAX_LENGTH];
 static char mPsk[WIFICONFIG_WPA2_KEY_MAX_BUFFER_SIZE];
@@ -265,9 +266,10 @@ int connect_wifi_detection(void)
 {
     boat_set_wifi_name_passwd();
     int ret = boat_connect_wifi(mSsid, mPsk);
+    int num = 0;
     if (ret < 0)
     {
-         BoatLog(BOAT_LOG_NORMAL, "JELLY:  boat_connect_wifi ERROR.\n");
+        Log_Debug( "JELLY:  boat_connect_wifi ERROR.\n");
         return ret;
     }
 
@@ -276,12 +278,14 @@ int connect_wifi_detection(void)
     {
         if ( WifiConfig_GetCurrentNetwork(&network) >=0)
         {
+            Log_Debug( "JELLY:  connect network OK!!!.\n");
             break;
         }
         else
         {
-             BoatLog(BOAT_LOG_NORMAL, "JELLY:can not connect network!!!.\n");
+             Log_Debug("JELLY:can not connect network %d times!!!.\n",num);
              BoatSleep(2);
+             num++;
         }
     }
     return 0;
@@ -296,7 +300,7 @@ int connect_wifi_detection(void)
 void create_tcp_server(void)
 {
     //begin create  tcp server
-    char buf[MAXRECVLEN];
+    char buf[MAXRECVLEN] = {0};
     int listenfd, connectfd;   /* socket descriptors */
     struct sockaddr_in server; /* server's address information */
     struct sockaddr_in client; /* client's address information */
@@ -305,7 +309,7 @@ void create_tcp_server(void)
     if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
         /* handle exception */
-        BoatLog(BOAT_LOG_NORMAL, "JELLY:socket() error. Failed to initiate a socket!!!.\n");
+        Log_Debug( "JELLY:socket() error. Failed to initiate a socket!!!.\n");
         return;
     }
  
@@ -321,33 +325,33 @@ void create_tcp_server(void)
     if(bind(listenfd, (struct sockaddr *)&server, sizeof(server)) == -1)
     {
         /* handle exception */
-        BoatLog(BOAT_LOG_NORMAL, "JELLY: Bind() error.!!!.\n");
+        Log_Debug( "JELLY: Bind() error.!!!.\n");
         return;
     }
     
     if(listen(listenfd, BACKLOG) == -1)
     {
-        BoatLog(BOAT_LOG_NORMAL, "JELLY: listen() error.!!!.\n");
+        Log_Debug( "JELLY: listen() error.!!!.\n");
         return;
     }
 
     addrlen = sizeof(client);
     while(1){
-        BoatLog(BOAT_LOG_NORMAL, "JELLY: waitting for ip connect.....\n");
+        Log_Debug("JELLY: waitting for ip connect.....\n");
         if((connectfd=accept(listenfd,(struct sockaddr *)&client, &addrlen))==-1)
            {
-            BoatLog(BOAT_LOG_NORMAL, "JELLY: accept() error.!!!.\n");
+             Log_Debug( "JELLY: accept() error.!!!.\n");
             return;
            }
 
         int iret=-1;
         while(1)
         {
+            memset(buf,0,MAXRECVLEN);
             iret = recv(connectfd, buf, MAXRECVLEN, 0);
             if(iret>0)
             {
-                //printf("%s\n", buf);
-                BoatLog(BOAT_LOG_NORMAL, "JELLY GET DATA: %s!!!.\n",buf);
+                Log_Debug( "JELLY GET DATA: %s\n",buf);
             }
             else
             {

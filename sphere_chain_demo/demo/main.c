@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     }
     
     create_tcp_server();
-    boat_demo_entry();
+    //boat_demo_entry();
 
     if (err < 0)
     {
