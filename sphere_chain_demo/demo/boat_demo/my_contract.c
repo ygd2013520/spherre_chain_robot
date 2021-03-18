@@ -6,7 +6,7 @@ This file is generated from contract ABI. DO NOT modify it by hand.
 // Generated C function interface from smart contract ABI
 
 #include "boatiotsdk.h"
-
+#include "boattypes.h"
 
 // Types specially defined for mapping from Solidity
 
@@ -51,7 +51,142 @@ This file is generated from contract ABI. DO NOT modify it by hand.
     typedef Bbytes32 BUINT256;
     typedef Bbytes32 SUINT256;
 
-BCHAR * my_contract_get(BoatFiscobcosTx *tx_ptr)
+BCHAR * Hello_isRegister(BoatFiscobcosTx *tx_ptr, BCHAR*Value)
+{
+    BCHAR *call_result_str = NULL;
+    BoatFieldVariable data_field;
+    BCHAR *function_prototye_str;
+    BUINT8 field_bytes32[32];
+    BUINT8 *data_offset_ptr;
+    BUINT32 data_offset_location;
+    BUINT32 nonFixed_filled_length;
+    BUINT32 nonFixed_actual_length;
+    boat_try_declare;
+
+    if( (tx_ptr == NULL) || (Value == NULL) )
+    {
+        BoatLog(BOAT_LOG_CRITICAL, "An NULL input parameter be detected.");
+        return NULL;
+    }
+
+    boat_try(BoatFiscobcosTxSetNonce(tx_ptr, BOAT_FISCOBCOS_NONCE_AUTO));
+
+    data_field.field_ptr = BoatMalloc(BOAT_ROUNDUP(strlen(Value), 32) + 32 + \
+                                      (1 * 32 + 4));
+    if(data_field.field_ptr == NULL) boat_throw(BOAT_ERROR, cleanup)
+    data_field.field_len = BOAT_ROUNDUP(strlen(Value), 32) + 32 + \
+                           (1 * 32 + 4);
+    data_offset_ptr = data_field.field_ptr;
+
+    function_prototye_str = "isRegister(string)";
+    BoatHash(BOAT_HASH_KECCAK256, (BUINT8 *)function_prototye_str, strlen(function_prototye_str), field_bytes32, NULL, NULL);
+    memcpy(data_offset_ptr, field_bytes32, 4);
+    data_offset_ptr += 4;
+
+    //param 'BCHAR*Value' offset location filled
+    data_offset_location = 32;
+    UtilityChangeEndian(&data_offset_location, sizeof(BUINT32));
+    memset(data_offset_ptr, 0x00, 32);
+    memcpy(data_offset_ptr + 32 - sizeof(BUINT32), &data_offset_location, sizeof(BUINT32));
+    data_offset_ptr += 32;
+
+    //non-fixed param 'BCHAR*Value' data filled
+    nonFixed_actual_length  = strlen(Value);
+    UtilityChangeEndian(&nonFixed_actual_length, sizeof(BUINT32));
+    memset(data_offset_ptr, 0x00, 32);
+    memcpy(data_offset_ptr + 32 - sizeof(BUINT32), &nonFixed_actual_length, sizeof(BUINT32));
+    data_offset_ptr += 32;
+
+    nonFixed_filled_length  = BOAT_ROUNDUP(strlen(Value), 32);
+    memset(data_offset_ptr, 0x00, nonFixed_filled_length);
+    memcpy(data_offset_ptr, Value, strlen(Value));
+    data_offset_ptr += nonFixed_filled_length;
+
+    call_result_str = BoatFiscobcosCallContractFunc(tx_ptr, function_prototye_str, data_field.field_ptr+4, data_field.field_len-4);
+
+
+    boat_catch(cleanup)
+    {
+        BoatLog(BOAT_LOG_VERBOSE, "Exception: %d", boat_exception);
+        if(data_field.field_ptr != NULL) BoatFree(data_field.field_ptr);
+        return(NULL);
+    }
+        
+    BoatFree(data_field.field_ptr);
+    return(call_result_str);
+
+}
+
+BCHAR * Hello_set(BoatFiscobcosTx *tx_ptr, BCHAR* name)
+{
+    static BCHAR tx_hash_str[67] = "";
+    BoatFieldVariable data_field;
+    BCHAR *function_prototye_str;
+    BUINT8 field_bytes32[32];
+    BUINT8 *data_offset_ptr;
+    BUINT32 data_offset_location;
+    BUINT32 nonFixed_filled_length;
+    BUINT32 nonFixed_actual_length;
+    boat_try_declare;
+
+    if( (tx_ptr == NULL) || (name == NULL) )
+    {
+        BoatLog(BOAT_LOG_CRITICAL, "An NULL input parameter be detected.");
+        return NULL;
+    }
+    boat_try(BoatFiscobcosTxSetNonce(tx_ptr, BOAT_FISCOBCOS_NONCE_AUTO));
+
+    data_field.field_ptr = BoatMalloc(BOAT_ROUNDUP(strlen(name), 32) + 32 + \
+                                      (1 * 32 + 4));
+    if(data_field.field_ptr == NULL) boat_throw(BOAT_ERROR, cleanup)
+    data_field.field_len = BOAT_ROUNDUP(strlen(name), 32) + 32 + \
+                           (1 * 32 + 4);
+    data_offset_ptr = data_field.field_ptr;
+
+    function_prototye_str = "set(string)";
+    BoatHash(BOAT_HASH_KECCAK256, (BUINT8 *)function_prototye_str, strlen(function_prototye_str), field_bytes32, NULL, NULL);
+    memcpy(data_offset_ptr, field_bytes32, 4);
+    data_offset_ptr += 4;
+
+    //param 'name' offset location filled
+    data_offset_location = 32;
+    UtilityChangeEndian(&data_offset_location, sizeof(BUINT32));
+    memset(data_offset_ptr, 0x00, 32);
+    memcpy(data_offset_ptr + 32 - sizeof(BUINT32), &data_offset_location, sizeof(BUINT32));
+    data_offset_ptr += 32;
+
+    //non-fixed param 'name' data filled
+    nonFixed_actual_length  = strlen(name);
+    UtilityChangeEndian(&nonFixed_actual_length, sizeof(BUINT32));
+    memset(data_offset_ptr, 0x00, 32);
+    memcpy(data_offset_ptr + 32 - sizeof(BUINT32), &nonFixed_actual_length, sizeof(BUINT32));
+    data_offset_ptr += 32;
+
+    nonFixed_filled_length  = BOAT_ROUNDUP(strlen(name), 32);
+    memset(data_offset_ptr, 0x00, nonFixed_filled_length);
+    memcpy(data_offset_ptr, name, strlen(name));
+    data_offset_ptr += nonFixed_filled_length;
+
+    boat_try(BoatFiscobcosTxSetData(tx_ptr, &data_field));
+
+    boat_try(BoatFiscobcosTxSend(tx_ptr));
+
+    UtilityBin2Hex(tx_hash_str, tx_ptr->tx_hash.field, tx_ptr->tx_hash.field_len, BIN2HEX_LEFTTRIM_UFMTDATA, BIN2HEX_PREFIX_0x_YES, BOAT_FALSE);
+
+
+    boat_catch(cleanup)
+    {
+        BoatLog(BOAT_LOG_VERBOSE, "Exception: %d", boat_exception);
+        if(data_field.field_ptr != NULL) BoatFree(data_field.field_ptr);
+        return(NULL);
+    }
+        
+    BoatFree(data_field.field_ptr);
+    return(tx_hash_str);
+
+}
+
+BCHAR * Hello_get(BoatFiscobcosTx *tx_ptr)
 {
     BCHAR *call_result_str = NULL;
     BoatFieldVariable data_field;
@@ -66,7 +201,7 @@ BCHAR * my_contract_get(BoatFiscobcosTx *tx_ptr)
         return NULL;
     }
 
-    
+//    boat_try(BoatFiscobcosTxSetNonce(tx_ptr, BOAT_FISCOBCOS_NONCE_AUTO));
 
     data_field.field_ptr = BoatMalloc((0 * 32 + 4));
     if(data_field.field_ptr == NULL) boat_throw(BOAT_ERROR, cleanup)
@@ -93,7 +228,7 @@ BCHAR * my_contract_get(BoatFiscobcosTx *tx_ptr)
 
 }
 
-BCHAR * my_contract_set(BoatFiscobcosTx *tx_ptr, BCHAR* n)
+BCHAR * Hello_register(BoatFiscobcosTx *tx_ptr, BCHAR* id)
 {
     static BCHAR tx_hash_str[67] = "";
     BoatFieldVariable data_field;
@@ -105,43 +240,41 @@ BCHAR * my_contract_set(BoatFiscobcosTx *tx_ptr, BCHAR* n)
     BUINT32 nonFixed_actual_length;
     boat_try_declare;
 
-    if( (tx_ptr == NULL) || (n == NULL) )
+    if( (tx_ptr == NULL) || (id == NULL) )
     {
         BoatLog(BOAT_LOG_CRITICAL, "An NULL input parameter be detected.");
         return NULL;
     }
 
-    boat_try(BoatFiscobcosTxSetNonce(tx_ptr, BOAT_FISCOBCOS_NONCE_AUTO));
-
-    data_field.field_ptr = BoatMalloc(BOAT_ROUNDUP(strlen(n), 32) + 32 + \
+    data_field.field_ptr = BoatMalloc(BOAT_ROUNDUP(strlen(id), 32) + 32 + \
                                       (1 * 32 + 4));
     if(data_field.field_ptr == NULL) boat_throw(BOAT_ERROR, cleanup)
-    data_field.field_len = BOAT_ROUNDUP(strlen(n), 32) + 32 + \
+    data_field.field_len = BOAT_ROUNDUP(strlen(id), 32) + 32 + \
                            (1 * 32 + 4);
     data_offset_ptr = data_field.field_ptr;
 
-    function_prototye_str = "set(string)";
+    function_prototye_str = "register(string)";
     BoatHash(BOAT_HASH_KECCAK256, (BUINT8 *)function_prototye_str, strlen(function_prototye_str), field_bytes32, NULL, NULL);
     memcpy(data_offset_ptr, field_bytes32, 4);
     data_offset_ptr += 4;
 
-    //param 'n' offset location filled
+    //param 'id' offset location filled
     data_offset_location = 32;
     UtilityChangeEndian(&data_offset_location, sizeof(BUINT32));
     memset(data_offset_ptr, 0x00, 32);
     memcpy(data_offset_ptr + 32 - sizeof(BUINT32), &data_offset_location, sizeof(BUINT32));
     data_offset_ptr += 32;
 
-    //non-fixed param 'n' data filled
-    nonFixed_actual_length  = strlen(n);
+    //non-fixed param 'id' data filled
+    nonFixed_actual_length  = strlen(id);
     UtilityChangeEndian(&nonFixed_actual_length, sizeof(BUINT32));
     memset(data_offset_ptr, 0x00, 32);
     memcpy(data_offset_ptr + 32 - sizeof(BUINT32), &nonFixed_actual_length, sizeof(BUINT32));
     data_offset_ptr += 32;
 
-    nonFixed_filled_length  = BOAT_ROUNDUP(strlen(n), 32);
+    nonFixed_filled_length  = BOAT_ROUNDUP(strlen(id), 32);
     memset(data_offset_ptr, 0x00, nonFixed_filled_length);
-    memcpy(data_offset_ptr, n, strlen(n));
+    memcpy(data_offset_ptr, id, strlen(id));
     data_offset_ptr += nonFixed_filled_length;
 
     boat_try(BoatFiscobcosTxSetData(tx_ptr, &data_field));
@@ -160,6 +293,72 @@ BCHAR * my_contract_set(BoatFiscobcosTx *tx_ptr, BCHAR* n)
         
     BoatFree(data_field.field_ptr);
     return(tx_hash_str);
+
+}
+
+BCHAR * Hello_verify(BoatFiscobcosTx *tx_ptr, BCHAR* id)
+{
+    BCHAR *call_result_str = NULL;
+    BoatFieldVariable data_field;
+    BCHAR *function_prototye_str;
+    BUINT8 field_bytes32[32];
+    BUINT8 *data_offset_ptr;
+    BUINT32 data_offset_location;
+    BUINT32 nonFixed_filled_length;
+    BUINT32 nonFixed_actual_length;
+    boat_try_declare;
+
+    if( (tx_ptr == NULL) || (id == NULL) )
+    {
+        BoatLog(BOAT_LOG_CRITICAL, "An NULL input parameter be detected.");
+        return NULL;
+    }
+
+    boat_try(BoatFiscobcosTxSetNonce(tx_ptr, BOAT_FISCOBCOS_NONCE_AUTO));
+
+    data_field.field_ptr = BoatMalloc(BOAT_ROUNDUP(strlen(id), 32) + 32 + \
+                                      (1 * 32 + 4));
+    if(data_field.field_ptr == NULL) boat_throw(BOAT_ERROR, cleanup)
+    data_field.field_len = BOAT_ROUNDUP(strlen(id), 32) + 32 + \
+                           (1 * 32 + 4);
+    data_offset_ptr = data_field.field_ptr;
+
+    function_prototye_str = "verify(string)";
+    BoatHash(BOAT_HASH_KECCAK256, (BUINT8 *)function_prototye_str, strlen(function_prototye_str), field_bytes32, NULL, NULL);
+    memcpy(data_offset_ptr, field_bytes32, 4);
+    data_offset_ptr += 4;
+
+    //param 'id' offset location filled
+    data_offset_location = 32;
+    UtilityChangeEndian(&data_offset_location, sizeof(BUINT32));
+    memset(data_offset_ptr, 0x00, 32);
+    memcpy(data_offset_ptr + 32 - sizeof(BUINT32), &data_offset_location, sizeof(BUINT32));
+    data_offset_ptr += 32;
+
+    //non-fixed param 'id' data filled
+    nonFixed_actual_length  = strlen(id);
+    UtilityChangeEndian(&nonFixed_actual_length, sizeof(BUINT32));
+    memset(data_offset_ptr, 0x00, 32);
+    memcpy(data_offset_ptr + 32 - sizeof(BUINT32), &nonFixed_actual_length, sizeof(BUINT32));
+    data_offset_ptr += 32;
+
+    nonFixed_filled_length  = BOAT_ROUNDUP(strlen(id), 32);
+    memset(data_offset_ptr, 0x00, nonFixed_filled_length);
+    memcpy(data_offset_ptr, id, strlen(id));
+    data_offset_ptr += nonFixed_filled_length;
+
+    call_result_str = BoatFiscobcosCallContractFunc(tx_ptr, function_prototye_str, data_field.field_ptr+4, data_field.field_len-4);
+
+
+    boat_catch(cleanup)
+    {
+        BoatLog(BOAT_LOG_VERBOSE, "Exception: %d", boat_exception);
+        if(data_field.field_ptr != NULL) BoatFree(data_field.field_ptr);
+        return(NULL);
+    }
+        
+    BoatFree(data_field.field_ptr);
+    return(call_result_str);
 
 }
 

@@ -51,5 +51,8 @@ This file is generated from contract ABI. DO NOT modify it by hand.
     typedef Bbytes32 BUINT256;
     typedef Bbytes32 SUINT256;
 
-BCHAR * my_contract_get(BoatFiscobcosTx *tx_ptr);
-BCHAR * my_contract_set(BoatFiscobcosTx *tx_ptr, BCHAR* n);
+BCHAR * Hello_isRegister(BoatFiscobcosTx *tx_ptr, BCHAR* Value);
+BCHAR * Hello_set(BoatFiscobcosTx *tx_ptr, BCHAR* name);
+BCHAR * Hello_get(BoatFiscobcosTx *tx_ptr);
+BCHAR * Hello_register(BoatFiscobcosTx *tx_ptr, BCHAR* id);
+BCHAR * Hello_verify(BoatFiscobcosTx *tx_ptr, BCHAR* id);

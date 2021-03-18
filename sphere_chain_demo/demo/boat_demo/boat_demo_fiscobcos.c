@@ -30,6 +30,7 @@ SOFTWARE.
 #include <pthread.h>
 #include <applibs/wificonfig.h>
 #include <applibs/log.h>
+#include <string.h>
 
 static uint8_t mSsid[WIFICONFIG_SSID_MAX_LENGTH];
 static char mPsk[WIFICONFIG_WPA2_KEY_MAX_BUFFER_SIZE];
@@ -135,7 +136,7 @@ __BOATSTATIC BOAT_RESULT fiscobcos_loadPersistWallet(BCHAR *wallet_name)
 }
 #endif
 
-BOAT_RESULT fiscobcos_helloworld(BoatFiscobcosWallet *wallet_ptr)
+BOAT_RESULT fiscobcos_helloworld_set(BoatFiscobcosWallet *wallet_ptr, char *chaindata)
 {
     BCHAR           *result_str;
     BoatFiscobcosTx tx_ctx;
@@ -154,8 +155,9 @@ BOAT_RESULT fiscobcos_helloworld(BoatFiscobcosWallet *wallet_ptr)
         BoatLog(BOAT_LOG_NORMAL, "BoatFiscobcosTxInit fails.");
         return BOAT_ERROR;
     }
-    BoatLog(BOAT_LOG_NORMAL, "HELLO FISCOBCOS");
-    result_str = my_contract_set(&tx_ctx, "HELLO FISCOBCOS!");
+    //BoatLog(BOAT_LOG_NORMAL, "HELLO FISCOBCOS");
+    //result_str = my_contract_set(&tx_ctx, "HELLO FISCOBCOS!");
+    result_str = Hello_set(&tx_ctx, chaindata);
     if( result_str == NULL )
 	{
         BoatLog(BOAT_LOG_NORMAL, "my_contract_set failed: %s.", result_str);
@@ -163,7 +165,7 @@ BOAT_RESULT fiscobcos_helloworld(BoatFiscobcosWallet *wallet_ptr)
     }
 	BoatLog(BOAT_LOG_NORMAL, "set returns: %s", result_str);
     
-    result_str = my_contract_get(&tx_ctx);
+    result_str = Hello_get(&tx_ctx);
     if( result_str == NULL )
 	{
         BoatLog(BOAT_LOG_NORMAL, "my_contract_get failed: %s.", result_str);
@@ -174,7 +176,41 @@ BOAT_RESULT fiscobcos_helloworld(BoatFiscobcosWallet *wallet_ptr)
     return BOAT_SUCCESS;
 }
 
-void boat_fiscobcos_entry(void)
+BOAT_RESULT fiscobcos_helloworld_verify(BoatFiscobcosWallet *wallet_ptr, char *did)
+{
+    BCHAR           *result_str;
+    BoatFiscobcosTx tx_ctx;
+    BOAT_RESULT     result;
+    
+    /* Set Contract Address */
+    result = BoatFiscobcosTxInit(wallet_ptr, &tx_ctx, BOAT_TRUE, 
+								 "0x11E1A300", //gasprice
+							     "0x33333333", //gaslimit
+							     "0x08e108c808b23521b34c1ca3b430d59b3618ea02",
+								 "0x01", //chainid
+								 "0x01"  //groupid
+								);
+    if( result != BOAT_SUCCESS )
+	{
+        BoatLog(BOAT_LOG_NORMAL, "BoatFiscobcosTxInit fails.");
+        return BOAT_ERROR;
+    }
+    //BoatLog(BOAT_LOG_NORMAL, "HELLO FISCOBCOS");
+    //result_str = my_contract_set(&tx_ctx, "HELLO FISCOBCOS!");
+    result_str = Hello_verify(&tx_ctx, did);
+    if( result_str == NULL )
+	{
+        BoatLog(BOAT_LOG_NORMAL, "Hello_verify failed: %s.", result_str);
+		return BOAT_ERROR;
+    }
+	BoatLog(BOAT_LOG_NORMAL, "set returns: %s", result_str);
+
+
+    return BOAT_SUCCESS;
+}
+
+//method: 0: set ,1:verify
+void boat_fiscobcos_entry(char *chaindata,int method)
 {
 	BOAT_RESULT  result  = BOAT_SUCCESS;
 
@@ -201,7 +237,16 @@ void boat_fiscobcos_entry(void)
 	}
     
 	/* step-3: execute 'fiscobcos_call_helloworld' */
-	result += fiscobcos_helloworld( g_fiscobcos_wallet_ptr );
+    if(method == 0)
+    {
+        result += fiscobcos_helloworld_set( g_fiscobcos_wallet_ptr ,chaindata);
+    }
+    else if (method == 1)
+    {
+        result  += fiscobcos_helloworld_verify( g_fiscobcos_wallet_ptr ,chaindata);
+    }
+    
+	
     if( result != BOAT_SUCCESS )
 	{
         BoatLog(BOAT_LOG_NORMAL, "fiscobcos helloworld access Failed: %d.", result);
@@ -230,7 +275,7 @@ static void* thread_boat_fiscobcos(void* arg)
 				network.frequencyMHz, network.signalRssi);
             
             BoatSleep(10);
-            boat_fiscobcos_entry();
+            //boat_fiscobcos_entry("NULL");
             break;
         }
         else
@@ -352,6 +397,40 @@ void create_tcp_server(void)
             if(iret>0)
             {
                 Log_Debug( "JELLY GET DATA: %s\n",buf);
+                char *delim = "$";
+                char *p;
+                int timenum = 0;
+                p = strtok(buf, delim);
+                if (p == NULL)
+                {
+                    send(connectfd, "wrong format", 12, 0); /* send to the client welcome message */
+                }
+                
+                else if(strncmp(p,"set",3) == 0 && strlen(p) == 3)
+                {
+                    //chain set
+                    p = strtok(NULL, delim);
+                    Log_Debug( "JELLY GET CHAIN SET DATA: %s\n",p);
+                    boat_fiscobcos_entry(p,0);
+
+                    send(connectfd, "set success", 11, 0); /* send to the client welcome message */
+
+                }
+                else if (strncmp(p,"verify",6) == 0 && strlen(p) == 6)
+                {
+                    //verify data
+                    p = strtok(NULL, delim);
+                    Log_Debug( "JELLY GET verify DATA: %s\n",p);
+                    boat_fiscobcos_entry(p,1);
+
+                    send(connectfd, "verify success", 14, 0); /* send to the client welcome message */
+                }
+                else
+                {
+                    //格式错误
+                    p= NULL;
+                    send(connectfd, "wrong format", 12, 0); /* send to the client welcome message */
+                }
             }
             else
             {
@@ -359,11 +438,10 @@ void create_tcp_server(void)
                 break;
             }
             /* print client's ip and port */
-            send(connectfd, buf, iret, 0); /* send to the client welcome message */
             close(connectfd);
         }
     }
-    close(listenfd); /* close listenfd */
+    close(listenfd); /* close listenfd  */ 
     return;
 }
 
