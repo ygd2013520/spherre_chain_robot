@@ -280,11 +280,22 @@ def camera():
             imgbox.value = cv.imencode('.jpg', img)[1].tobytes()
         except KeyboardInterrupt:capture.release()
 
-
-#create socket server
+#create client
 import socket
+def create_client(msg):
+    client = socket.socket(socket.AF_INET,socket.SOCK_STREAM) #声明socket类型，同时生成链接对象
+    print(socket.AF_INET,socket.SOCK_STREAM)
+    client.connect(('192.168.31.106',4321)) #建立一个链接，连接到本地的6969端口
+    #msg = 'verify$did:chisid:0xd9aeaa982fc21ea9addaf09e4f0c6a23a08d306a'#strip默认取出字符串的
+    client.send(msg.encode('utf-8'))  #发送一条信息 python3 只接收btye流
+    data = client.recv(1024) #接收一个信息，并指定接收的大小 为1024字节
+    print('recv:',data.decode()) #输出我接收的信息
+    client.close() #关闭这个链接
+            
+#create socket server
 def create_server():
     global model,color_list,msg
+    num = 1
     # 初始化机械手
     while True:
         model = "Calibration"
@@ -313,6 +324,9 @@ def create_server():
             print('recive:',data.decode()) #打印接收到的数据
             if data.decode() == 'arrived':
                 if len(msg)!= 0:
+                    #verify small car
+                    msg = 'verify$did:chisid:0xd9aeaa982fc21ea9addaf09e4f0c6a23a08d306a'
+                    create_client(msg)
                     model = 'Grap'
                     conn.send("begin grap".encode())
                     print("status: begin grap")
@@ -322,6 +336,10 @@ def create_server():
                     print("status: nothing get")
             elif data.decode() == 'iscompleted':
                 if target.iscompleted == True:
+                    #complete go chain
+                    msg = "set$Get Components Completed , Count: %d" % num
+                    create_client(msg)
+                    num = num + 1
                     conn.send("yes".encode())
                     print("status: completed grap")
                 else:

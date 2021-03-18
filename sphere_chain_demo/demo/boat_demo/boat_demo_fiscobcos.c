@@ -83,10 +83,10 @@ int boat_connect_wifi(const uint8_t* ssid, const char* psk)
 int boat_set_wifi_name_passwd(void)
 {
     memset(mSsid, 0x00, sizeof(mSsid));
-    strncpy(mSsid, "Xiaomi_77B8_5G", 14);
+    strncpy(mSsid, "Robot", 5);
 
     memset(mPsk, 0x00, sizeof(mPsk));
-    strncpy(mPsk, "changhongdtsys", 14);
+    strncpy(mPsk, "88888888", 8);
 
     return 0;
 }
@@ -101,7 +101,7 @@ __BOATSTATIC BOAT_RESULT fiscobcos_createPersistWallet(BCHAR *wallet_name)
 	strncpy( (char*)wallet_config.prikeyId, 
 			 "boatkey/fiscobcos_client_bmm.key", 
 			 BOAT_KEYID_MAX_LEN - 1 );
-    strncpy( wallet_config.node_url_str, "http://192.168.31.237:8545", BOAT_NODE_URL_MAX_LEN - 1 );
+    strncpy( wallet_config.node_url_str, "http://192.168.31.105:8545", BOAT_NODE_URL_MAX_LEN - 1 );
 
 	/* create fiscobcos wallet */
    index = BoatWalletCreate(BOAT_PROTOCOL_FISCOBCOS, wallet_name, &wallet_config, sizeof(BoatFiscobcosWalletConfig));
@@ -146,7 +146,7 @@ BOAT_RESULT fiscobcos_helloworld_set(BoatFiscobcosWallet *wallet_ptr, char *chai
     result = BoatFiscobcosTxInit(wallet_ptr, &tx_ctx, BOAT_TRUE, 
 								 "0x11E1A300", //gasprice
 							     "0x33333333", //gaslimit
-							     "0x08e108c808b23521b34c1ca3b430d59b3618ea02",
+							     "0xF24982bfEb477FfCA6c5a9102C4fcD258e1a1899",
 								 "0x01", //chainid
 								 "0x01"  //groupid
 								);
@@ -186,7 +186,7 @@ BOAT_RESULT fiscobcos_helloworld_verify(BoatFiscobcosWallet *wallet_ptr, char *d
     result = BoatFiscobcosTxInit(wallet_ptr, &tx_ctx, BOAT_TRUE, 
 								 "0x11E1A300", //gasprice
 							     "0x33333333", //gaslimit
-							     "0x08e108c808b23521b34c1ca3b430d59b3618ea02",
+							     "0xF24982bfEb477FfCA6c5a9102C4fcD258e1a1899",
 								 "0x01", //chainid
 								 "0x01"  //groupid
 								);
@@ -243,7 +243,13 @@ void boat_fiscobcos_entry(char *chaindata,int method)
     }
     else if (method == 1)
     {
+        char datastr[512] = {0};
+        char datastr_cp[512] = {0};
+        sprintf(datastr,"begin verify device id : %s",chaindata);
+        fiscobcos_helloworld_set( g_fiscobcos_wallet_ptr ,datastr);
         result  += fiscobcos_helloworld_verify( g_fiscobcos_wallet_ptr ,chaindata);
+        sprintf(datastr_cp,"completed verify device id : %s",chaindata);
+        fiscobcos_helloworld_set( g_fiscobcos_wallet_ptr ,datastr_cp);
     }
     
 	
