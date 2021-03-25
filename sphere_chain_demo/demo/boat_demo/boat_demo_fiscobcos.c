@@ -146,7 +146,7 @@ BOAT_RESULT fiscobcos_helloworld_set(BoatFiscobcosWallet *wallet_ptr, char *chai
     result = BoatFiscobcosTxInit(wallet_ptr, &tx_ctx, BOAT_TRUE, 
 								 "0x11E1A300", //gasprice
 							     "0x33333333", //gaslimit
-							     "0xF24982bfEb477FfCA6c5a9102C4fcD258e1a1899",
+							     "0xc16e00D176a515F2324D691D91407C4DBd24860c",
 								 "0x01", //chainid
 								 "0x01"  //groupid
 								);
@@ -186,7 +186,7 @@ BOAT_RESULT fiscobcos_helloworld_verify(BoatFiscobcosWallet *wallet_ptr, char *d
     result = BoatFiscobcosTxInit(wallet_ptr, &tx_ctx, BOAT_TRUE, 
 								 "0x11E1A300", //gasprice
 							     "0x33333333", //gaslimit
-							     "0xF24982bfEb477FfCA6c5a9102C4fcD258e1a1899",
+							     "0xc16e00D176a515F2324D691D91407C4DBd24860c",
 								 "0x01", //chainid
 								 "0x01"  //groupid
 								);
