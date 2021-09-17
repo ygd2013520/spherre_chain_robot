@@ -1,2 +1,3 @@
 1.dofbot_color_identify：机械臂树莓派代码
 2.sphere_chain_demo： sphere模组区块链连接代码
+3.YahboomArm.sh机械臂自动启动脚本，将此文件替换/home/dofbot/Arm/YahboomArm.sh实现机械臂自动启动服务

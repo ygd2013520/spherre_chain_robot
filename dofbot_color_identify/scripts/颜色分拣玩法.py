@@ -282,12 +282,12 @@ def camera():
 
 #create client
 import socket
-def create_client(msg):
+def create_client(msg_send):
     client = socket.socket(socket.AF_INET,socket.SOCK_STREAM) #声明socket类型，同时生成链接对象
     print(socket.AF_INET,socket.SOCK_STREAM)
     client.connect(('192.168.31.107',4321)) #建立一个链接，连接到本地的6969端口
-    #msg = 'verify$did:chisid:0xd9aeaa982fc21ea9addaf09e4f0c6a23a08d306a'#strip默认取出字符串的
-    client.send(msg.encode('utf-8'))  #发送一条信息 python3 只接收btye流
+    #msg_send = 'verify$did:chisid:0xd9aeaa982fc21ea9addaf09e4f0c6a23a08d306a'#strip默认取出字符串的
+    client.send(msg_send.encode('utf-8'))  #发送一条信息 python3 只接收btye流
     data = client.recv(1024) #接收一个信息，并指定接收的大小 为1024字节
     print('recv:',data.decode()) #输出我接收的信息
     client.close() #关闭这个链接

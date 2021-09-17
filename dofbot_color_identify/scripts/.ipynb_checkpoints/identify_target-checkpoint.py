@@ -111,20 +111,26 @@ class identify_GetTarget:
         
         if xy != None: self.xy = xy
         move_status=0
-        for i in msg.values():
-            if i !=None: move_status=1
+        try:
+            for i in msg.values():
+                if i !=None: move_status=1
+        except Exception:
+            print("error")
+        
         if move_status==1:
             self.arm.Arm_Buzzer_On(1)
             sleep(0.5)
-        for name, pos in msg.items():
-            # print "pos : ",pos
-            # print "name : ",name
-            try:
+        try:
+            print(msg)
+            for name, pos in msg.items():
+                # print "pos : ",pos
+                # print "name : ",name
                 # 此处ROS反解通讯,获取各关节旋转角度
                 joints = self.server_joint(pos)
                 # 调取移动函数
                 self.grap.identify_move(str(name), joints)
-            except Exception: print("sqaure_pos empty")
+        except Exception:
+            print("error")
         #下面操作让机械手回归初始位置
         if move_status==1:
             # 架起
@@ -138,7 +144,7 @@ class identify_GetTarget:
             self.arm.Arm_serial_servo_write6_array(joints_0, 500)
             sleep(0.5)
         sleep(2)
-        #joints_down = [133, 50, 20, 60, 265, 30]
+        joints_down = [133, 50, 20, 60, 265, 30]
         joints_down = [180, 50, 20, 60, 265, 30]
         joints_new = [joints[0], joints[1], joints[2], joints[3], 265, 145]
         self.grap.move_back(joints_down,joints_new)
